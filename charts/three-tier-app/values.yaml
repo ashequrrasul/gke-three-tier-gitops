@@ -1,0 +1,111 @@
+namespace:
+  name: three-tier
+  create: true
+
+backend:
+  name: backend
+  replicas: 2
+  image:
+    repository: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/backend
+    tag: v3
+    pullPolicy: IfNotPresent
+  serviceAccount:
+    name: backend-sa
+    gcpServiceAccount: gke-backend-sa@project-40d105bf-bb2b-4bf6-b9f.iam.gserviceaccount.com
+  service:
+    name: backend-service
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  containerPort: 8080
+  env:
+    port: "8080"
+    databaseUrlFile: /mnt/secrets/DATABASE_URL
+  secretProviderClass:
+    name: backend-secret-provider
+    provider: gke
+    secretResourceName: projects/301954988003/secrets/DATABASE_URL/versions/latest
+    secretPath: DATABASE_URL
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 256m
+      memory: 256Mi
+  probes:
+    path: /api/health
+    readinessInitialDelaySeconds: 10
+    readinessPeriodSeconds: 10
+    livenessInitialDelaySeconds: 20
+    livenessPeriodSeconds: 20
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    cpuAverageUtilization: 70
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+frontend:
+  name: frontend
+  replicas: 2
+  image:
+    repository: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/frontend
+    tag: v2
+    pullPolicy: IfNotPresent
+  service:
+    name: frontend-service
+    type: ClusterIP
+    port: 80
+    targetPort: 80
+  containerPort: 80
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      cpu: 256m
+      memory: 256Mi
+  probes:
+    path: /
+    readinessInitialDelaySeconds: 10
+    readinessPeriodSeconds: 10
+    livenessInitialDelaySeconds: 20
+    livenessPeriodSeconds: 20
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 6
+    cpuAverageUtilization: 70
+  pdb:
+    enabled: true
+    minAvailable: 1
+
+ingress:
+  enabled: true
+  name: three-tier-ingress
+  classAnnotation: gce
+  paths:
+    backendPath: /api
+    frontendPath: /
+
+networkPolicy:
+  enabled: true
+  gkeHealthCheckCidrs:
+    - 35.191.0.0/16
+    - 130.211.0.0/22
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 3000
+  fsGroup: 2000
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL

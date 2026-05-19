@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.backend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.name }}
+    spec:
+      serviceAccountName: {{ .Values.backend.serviceAccount.name }}
+      securityContext:
+{{ toYaml .Values.podSecurityContext | indent 8 }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - {{ .Values.backend.name }}
+      containers:
+        - name: {{ .Values.backend.name }}
+          image: {{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.containerPort }}
+          securityContext:
+{{ toYaml .Values.containerSecurityContext | indent 12 }}
+          env:
+            - name: PORT
+              value: {{ .Values.backend.env.port | quote }}
+            - name: DATABASE_URL_FILE
+              value: {{ .Values.backend.env.databaseUrlFile | quote }}
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          resources:
+{{ toYaml .Values.backend.resources | indent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.backend.probes.path }}
+              port: {{ .Values.backend.containerPort }}
+            initialDelaySeconds: {{ .Values.backend.probes.readinessInitialDelaySeconds }}
+            periodSeconds: {{ .Values.backend.probes.readinessPeriodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.backend.probes.path }}
+              port: {{ .Values.backend.containerPort }}
+            initialDelaySeconds: {{ .Values.backend.probes.livenessInitialDelaySeconds }}
+            periodSeconds: {{ .Values.backend.probes.livenessPeriodSeconds }}
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store-gke.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.backend.secretProviderClass.name }}

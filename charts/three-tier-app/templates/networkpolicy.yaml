@@ -1,0 +1,77 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-network-policy
+  namespace: {{ .Values.namespace.name }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.backend.name }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {{ .Values.frontend.name }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.backend.service.port }}
+    - from:
+{{- range .Values.networkPolicy.gkeHealthCheckCidrs }}
+        - ipBlock:
+            cidr: {{ . }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.backend.service.port }}
+  egress:
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - ports:
+        - protocol: TCP
+          port: 443
+    - ports:
+        - protocol: TCP
+          port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-network-policy
+  namespace: {{ .Values.namespace.name }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+{{- range .Values.networkPolicy.gkeHealthCheckCidrs }}
+        - ipBlock:
+            cidr: {{ . }}
+{{- end }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.frontend.service.port }}
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: {{ .Values.backend.name }}
+      ports:
+        - protocol: TCP
+          port: {{ .Values.backend.service.port }}
+    - ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+{{- end }}

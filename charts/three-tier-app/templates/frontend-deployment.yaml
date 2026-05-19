@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.frontend.name }}
+  namespace: {{ .Values.namespace.name }}
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.frontend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.frontend.name }}
+    spec:
+      securityContext:
+{{ toYaml .Values.podSecurityContext | indent 8 }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - {{ .Values.frontend.name }}
+      containers:
+        - name: {{ .Values.frontend.name }}
+          image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+          imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.frontend.containerPort }}
+          securityContext:
+{{ toYaml .Values.containerSecurityContext | indent 12 }}
+          volumeMounts:
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+            - name: nginx-run
+              mountPath: /var/run
+            - name: nginx-tmp
+              mountPath: /tmp
+            - name: nginx-log
+              mountPath: /var/log/nginx
+          resources:
+{{ toYaml .Values.frontend.resources | indent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.frontend.probes.path }}
+              port: {{ .Values.frontend.containerPort }}
+            initialDelaySeconds: {{ .Values.frontend.probes.readinessInitialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.probes.readinessPeriodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.frontend.probes.path }}
+              port: {{ .Values.frontend.containerPort }}
+            initialDelaySeconds: {{ .Values.frontend.probes.livenessInitialDelaySeconds }}
+            periodSeconds: {{ .Values.frontend.probes.livenessPeriodSeconds }}
+      volumes:
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        - name: nginx-tmp
+          emptyDir: {}
+        - name: nginx-log
+          emptyDir: {}
