@@ -35,7 +35,7 @@ spec:
                         - backend
       containers:
         - name: backend
-          image: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/backend:v3
+          image: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/backend:0d8a1189c3f0d4780ea809e8fd64ca353741b82b
           ports:
             - containerPort: 8080
           securityContext:
