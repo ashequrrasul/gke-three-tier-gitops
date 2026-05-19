@@ -34,7 +34,7 @@ spec:
                         - frontend
       containers:
         - name: frontend
-          image: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/frontend:v2
+          image: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/frontend:0d8a1189c3f0d4780ea809e8fd64ca353741b82b
           ports:
             - containerPort: 80
           securityContext:
