@@ -5,6 +5,11 @@ namespace:
 backend:
   name: backend
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   image:
     repository: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/backend
     tag: v3
@@ -51,6 +56,12 @@ backend:
 frontend:
   name: frontend
   replicas: 2
+  frontend:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   image:
     repository: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/frontend
     tag: v2

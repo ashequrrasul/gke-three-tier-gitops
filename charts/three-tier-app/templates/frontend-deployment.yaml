@@ -5,6 +5,8 @@ metadata:
   namespace: {{ .Values.namespace.name }}
 spec:
   replicas: {{ .Values.frontend.replicas }}
+  strategy:
+{{ toYaml .Values.frontend.strategy | indent 4 }}
   selector:
     matchLabels:
       app: {{ .Values.frontend.name }}
