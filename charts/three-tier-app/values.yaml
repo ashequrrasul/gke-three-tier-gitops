@@ -33,7 +33,7 @@ backend:
     secretPath: DATABASE_URL
   resources:
     requests:
-      cpu: 50m
+      cpu: 10m
       memory: 128Mi
     limits:
       cpu: 256m
@@ -74,7 +74,7 @@ frontend:
   containerPort: 80
   resources:
     requests:
-      cpu: 25m
+      cpu: 10m
       memory: 128Mi
     limits:
       cpu: 256m
