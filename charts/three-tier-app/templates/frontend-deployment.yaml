@@ -6,7 +6,7 @@ metadata:
 spec:
   replicas: {{ .Values.frontend.replicas }}
   strategy:
-{{ toYaml .Values.frontend.strategy | indent 4 }}
+{{ toYaml .Values.frontend.strategy | nindent 4 }}
   selector:
     matchLabels:
       app: {{ .Values.frontend.name }}
@@ -16,7 +16,7 @@ spec:
         app: {{ .Values.frontend.name }}
     spec:
       securityContext:
-{{ toYaml .Values.podSecurityContext | indent 8 }}
+{{ toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -36,7 +36,7 @@ spec:
           ports:
             - containerPort: {{ .Values.frontend.containerPort }}
           securityContext:
-{{ toYaml .Values.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.containerSecurityContext | nindent 12 }}
           volumeMounts:
             - name: nginx-cache
               mountPath: /var/cache/nginx
@@ -47,7 +47,7 @@ spec:
             - name: nginx-log
               mountPath: /var/log/nginx
           resources:
-{{ toYaml .Values.frontend.resources | indent 12 }}
+{{ toYaml .Values.frontend.resources | nindent 12 }}
           readinessProbe:
             httpGet:
               path: {{ .Values.frontend.probes.path }}

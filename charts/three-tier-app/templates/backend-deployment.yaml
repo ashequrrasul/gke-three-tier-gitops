@@ -6,7 +6,7 @@ metadata:
 spec:
   replicas: {{ .Values.backend.replicas }}
    strategy:
-{{ toYaml .Values.backend.strategy | indent 4 }}
+{{ toYaml .Values.backend.strategy | nindent 4 }}
   selector:
     matchLabels:
       app: {{ .Values.backend.name }}
@@ -17,7 +17,7 @@ spec:
     spec:
       serviceAccountName: {{ .Values.backend.serviceAccount.name }}
       securityContext:
-{{ toYaml .Values.podSecurityContext | indent 8 }}
+{{ toYaml .Values.podSecurityContext | nindent 8 }}
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -37,7 +37,7 @@ spec:
           ports:
             - containerPort: {{ .Values.backend.containerPort }}
           securityContext:
-{{ toYaml .Values.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.containerSecurityContext | nindent 12 }}
           env:
             - name: PORT
               value: {{ .Values.backend.env.port | quote }}
@@ -48,7 +48,7 @@ spec:
               mountPath: "/mnt/secrets"
               readOnly: true
           resources:
-{{ toYaml .Values.backend.resources | indent 12 }}
+{{ toYaml .Values.backend.resources | nindent 12 }}
           readinessProbe:
             httpGet:
               path: {{ .Values.backend.probes.path }}
