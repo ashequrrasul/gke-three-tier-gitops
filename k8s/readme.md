@@ -4,11 +4,13 @@ gcloud container clusters create gke-three-tier \
   --subnetwork gke-subnet \
   --cluster-secondary-range-name gke-pods \
   --services-secondary-range-name gke-services \
+  --enable-private-nodes \
+  --master-ipv4-cidr 172.16.0.0/28 \
   --num-nodes 1 \
   --enable-autoscaling \
   --min-nodes 1 \
-  --max-nodes 3 \
-  --machine-type e2-medium \
+  --max-nodes 4 \
+  --machine-type e2-standard-2 \
   --disk-type pd-balanced \
   --disk-size 30 \
   --enable-ip-alias \
