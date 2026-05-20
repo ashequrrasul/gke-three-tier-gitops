@@ -11,7 +11,7 @@ backend:
       maxUnavailable: 0
   image:
     repository: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/backend
-    tag: ac71948b4ab5d7a73b97253ac4198d1accb048ce
+    tag: 17850cd0ccdde48d9d09b13b31cad43a661452ff
     pullPolicy: IfNotPresent
   serviceAccount:
     name: backend-sa
