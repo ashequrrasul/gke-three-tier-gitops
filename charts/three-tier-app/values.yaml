@@ -113,7 +113,7 @@ containerSecurityContext:
       - ALL
 frontendCanary:
   enabled: true
-  name: frontendCanary
+  name: frontend-canary
   replicas: 2
   version: v2
   image:
