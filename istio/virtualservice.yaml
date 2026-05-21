@@ -24,5 +24,14 @@ spec:
       route:
         - destination:
             host: frontend-service.three-tier-helm.svc.cluster.local
+            subset: v1
             port:
               number: 80
+            weight: 90
+        - destination:
+            host: frontend-service.three-tier-helm.svc.cluster.local
+            subset: v2
+            port:
+              number: 80
+            weight: 10
+            

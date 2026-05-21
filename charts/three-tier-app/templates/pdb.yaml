@@ -3,7 +3,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ .Values.backend.name }}-pdb
-  namespace: {{ .Values.namespace.name }}
+  namespace: {{ .Release.Namespace }}
 spec:
   minAvailable: {{ .Values.backend.pdb.minAvailable }}
   selector:
@@ -16,7 +16,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ .Values.frontend.name }}-pdb
-  namespace: {{ .Values.namespace.name }}
+  namespace: {{ .Release.Namespace }}
 spec:
   minAvailable: {{ .Values.frontend.pdb.minAvailable }}
   selector:

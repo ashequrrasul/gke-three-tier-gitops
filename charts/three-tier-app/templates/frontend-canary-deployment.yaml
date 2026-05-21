@@ -1,21 +1,22 @@
+{{- if .Values.frontendCanary.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.frontend.name }}
+  name: {{ .Values.frontendCanary.name }}
   namespace: {{ .Release.Namespace }}
 spec:
-  replicas: {{ .Values.frontend.replicas }}
+  replicas: {{ .Values.frontendCanary.replicas }}
   strategy:
 {{ toYaml .Values.frontend.strategy | nindent 4 }}
   selector:
     matchLabels:
       app: {{ .Values.frontend.name }}
-      version: {{ .Values.frontend.version }}
+      version: {{ .Values.frontendCanary.version }}
   template:
     metadata:
       labels:
         app: {{ .Values.frontend.name }}
-        version: {{ .Values.frontend.version }}
+        version: {{ .Values.frontendCanary.version }}
     spec:
       securityContext:
 {{ toYaml .Values.podSecurityContext | nindent 8 }}
@@ -33,7 +34,7 @@ spec:
                         - {{ .Values.frontend.name }}
       containers:
         - name: {{ .Values.frontend.name }}
-          image: {{ .Values.frontend.image.repository }}:{{ .Values.frontend.image.tag }}
+          image: {{ .Values.frontend.image.repository }}:{{ .Values.frontendCanary.image.tag }}
           imagePullPolicy: {{ .Values.frontend.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.frontend.containerPort }}
@@ -71,3 +72,5 @@ spec:
           emptyDir: {}
         - name: nginx-log
           emptyDir: {}
+
+{{- end }}
