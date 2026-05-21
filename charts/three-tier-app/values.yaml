@@ -59,7 +59,7 @@ frontend:
       maxUnavailable: 0
   image:
     repository: us-east5-docker.pkg.dev/project-40d105bf-bb2b-4bf6-b9f/gcp-three-tier/frontend
-    tag: da763be8f1b04399e837dbc617e2e65778432937
+    tag: 0bebf8e3acac70069714a60b758633d0f6fb4e69
     pullPolicy: IfNotPresent
   service:
     name: frontend-service
@@ -118,5 +118,3 @@ frontendCanary:
   version: v2
   image:
     tag: 2bfa0dbcb95a68f96a1244e4d5f9f12c75eeadf0
-
-
