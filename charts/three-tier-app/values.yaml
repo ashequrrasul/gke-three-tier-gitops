@@ -51,6 +51,7 @@ backend:
 frontend:
   name: frontend
   replicas: 2
+  version: v1
   frontend:
   strategy:
     type: RollingUpdate
@@ -111,3 +112,11 @@ containerSecurityContext:
   capabilities:
     drop:
       - ALL
+frontendCanary:
+  enabled: true
+  name: frontendCanary
+  version: v2
+  image:
+    tag: 2bfa0dbcb95a68f96a1244e4d5f9f12c75eeadf0
+
+
