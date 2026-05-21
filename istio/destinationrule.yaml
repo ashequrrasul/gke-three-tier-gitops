@@ -3,31 +3,72 @@ kind: DestinationRule
 metadata:
   name: backend-destinationrule
   namespace: three-tier-helm
+  labels:
+    app: three-tier
+    env: production
 spec:
   host: backend-service.three-tier-helm.svc.cluster.local
   trafficPolicy:
     tls:
       mode: ISTIO_MUTUAL
+    # Connection pool tuning for production
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 5s
+      http:
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 1000
+        idleTimeout: 90s
+    # Outlier detection — automatically eject unhealthy pods
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+
 ---
 apiVersion: networking.istio.io/v1
 kind: DestinationRule
 metadata:
   name: frontend-destinationrule
   namespace: three-tier-helm
+  labels:
+    app: three-tier
+    env: production
 spec:
   host: frontend-service.three-tier-helm.svc.cluster.local
-  subsets:
-  - name: v1
-    labels:
-      version: v1
-  - name: v2
-    labels:
-      version: v2
   trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+    # Sticky session via cookie — Envoy auto-creates the cookie if absent.
+    # Same cookie on refresh → same pod → same version (Option A).
     loadBalancer:
       consistentHash:
         httpCookie:
           name: frontend-session
-          ttl: 3600s
-    tls:
-      mode: ISTIO_MUTUAL
+          ttl: 3600s          # 1 hour; tune to your session length
+    # Connection pool tuning
+    connectionPool:
+      tcp:
+        maxConnections: 200
+        connectTimeout: 5s
+      http:
+        http1MaxPendingRequests: 200
+        http2MaxRequests: 2000
+        idleTimeout: 90s
+    # Outlier detection
+    outlierDetection:
+      consecutive5xxErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2

@@ -3,6 +3,10 @@ kind: PeerAuthentication
 metadata:
   name: default-mtls
   namespace: three-tier-helm
+  labels:
+    app: three-tier
+    env: production
 spec:
+  # Enforce strict mTLS for ALL services in the namespace
   mtls:
     mode: STRICT
