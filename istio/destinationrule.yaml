@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: backend-destinationrule
+  namespace: three-tier-helm
+spec:
+  host: backend-service.three-tier-helm.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: frontend-destinationrule
+  namespace: three-tier-helm
+spec:
+  host: frontend-service.three-tier-helm.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
