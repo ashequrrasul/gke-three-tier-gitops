@@ -10,7 +10,6 @@ spec:
   selector:
     matchLabels:
       app: {{ .Values.frontend.name }}
-      version: {{ .Values.frontend.version }}
   template:
     metadata:
       labels:
