@@ -24,5 +24,10 @@ spec:
     labels:
       version: v2
   trafficPolicy:
+    loadBalancer:
+      consistentHash:
+        httpCookie:
+          name: frontend-session
+          ttl: 3600s
     tls:
       mode: ISTIO_MUTUAL
