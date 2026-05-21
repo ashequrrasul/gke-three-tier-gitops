@@ -52,7 +52,6 @@ frontend:
   name: frontend
   replicas: 2
   version: v1
-  frontend:
   strategy:
     type: RollingUpdate
     rollingUpdate:
