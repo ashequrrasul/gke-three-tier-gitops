@@ -114,6 +114,7 @@ containerSecurityContext:
 frontendCanary:
   enabled: true
   name: frontendCanary
+  replicas: 2
   version: v2
   image:
     tag: 2bfa0dbcb95a68f96a1244e4d5f9f12c75eeadf0
